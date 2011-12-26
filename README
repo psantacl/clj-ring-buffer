@@ -1,17 +1,32 @@
 # clj-ring-buffer
 
-FIXME: write description
+A lockless ring buffer supporting an arbitrary number of producers and consumer.
 
 ## Usage
 
-FIXME: write
+(make-ring-buffer num-of-producers num-of-consumers size-of-ring-buffer))
 
-## Installation
+make-ring-buffer returns a map containing producer functions, consumer functions, and the underlying ring-buffer itself.  
 
-FIXME: write
+  (let [{producer-1 :producer-1 consumer-1 :consumer-1 producer-2 :producer-2 consumer-2 :consumer-2
+         r-buffer :ring-buffer}
+        (rb/make-ring-buffer 2 2 4)]
+
+    (producer-1 "A")
+    (producer-2 "B")
+
+    (consumer-1)
+    ;;returns "A"
+
+    (empty-buffer? r-buffer 1)
+    ;;returns true. Buffer is empty for consumer-1
+
+    (consumer-2)
+    ;;returns "B"
+
+    (empty-buffer? r-buffer 2)
+    ;;returns true. Buffer is empty for consumer-2
 
 ## License
 
-Copyright (C) 2010 FIXME
-
-Distributed under the Eclipse Public License, the same as Clojure.
+Information Wants To Be Free

@@ -64,21 +64,6 @@
           write-count     (write-counts target-producer)]
       (> next-read write-count)))
   
-  #_(comment
-    {1 1
-     2 2
-     3 3
-     4 1}
-    (or (and (= 12121 2) 2)
-        (rem 1 2))
-    
-    (rem 1 3)
-    (rem 2 3)
-    (rem 3 3)
-    (rem 4 3)
-    (rem 5 3)
-    (rem 6 3)
-    )
   (full-buffer? [this producer]
     (producer-exists! this producer)
     (let [writes          (write-counts producer)
