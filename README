@@ -14,6 +14,10 @@ make-ring-buffer returns a map containing producer functions, consumer functions
         (rb/make-ring-buffer 2 2 4)]
 
     (producer-1 "A")
+    ;;will return false if the buffer is full with respect to
+    ;;producer-1 and the data could not be inserted into the ring buffer.
+    ;;In such a case, the production should be retried by the client.
+
     (producer-2 "B")
 
     (consumer-1)
