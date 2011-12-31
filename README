@@ -1,6 +1,7 @@
 # clj-ring-buffer
 
-A lockless ring buffer supporting an arbitrary number of producers and consumer.
+A lockless ring buffer supporting an arbitrary number of producers and
+consumer.  This is a VERY fast mechanism for inter-thread communication.
 
 ## Usage
 
@@ -26,6 +27,10 @@ make-ring-buffer returns a map containing producer functions, consumer functions
 
     (empty-buffer? r-buffer 2)
     ;;returns true. Buffer is empty for consumer-2
+
+    ;;view the contents of the ring buffer
+    (peek r-buffer)
+    ;;("A","B", nil, nil)
 
 ## License
 
