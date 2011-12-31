@@ -17,8 +17,7 @@
   (put [this producer val]))
 
 
-
-(deftype RingBufferOpaque [size data num-producers num-consumers ^{:volatile-mutable true} read-counts ^{:volatile-mutable true} write-counts]
+(deftype RingBufferOpaque [^int size ^java.util.ArrayList data ^int num-producers ^int num-consumers ^{:volatile-mutable true} read-counts ^{:volatile-mutable true} write-counts]
   RingBuffer
   
   (examine-write-counts [this]
@@ -34,7 +33,7 @@
     num-consumers)
 
   (peek [this]
-    (seq data))
+    (seq (.toArray data)))
 
   (producer-exists! [this producer]
     (if (or (< producer 1)  (> producer num-producers))
@@ -95,7 +94,7 @@
             read-idx        (rem (dec next-read) size)]        
         (set! read-counts
               (assoc-in read-counts [consumer] next-read))
-        (aget data read-idx))))
+        (.get data read-idx))))
   
   
   
@@ -109,13 +108,20 @@
                               (+ writes num-producers))
             ;; next-write      (+ (* writes num-producers) producer)
             write-idx       (rem (dec next-write) size)]
-        (aset data write-idx val)
+        (.set data write-idx val)
         (set! write-counts
               (assoc-in write-counts [producer] next-write))        
         true))))
 
 
 
+(defn initialize-array [ ^int size]
+  (let [^java.util.ArrayList data  (doto
+                                       (java.util.ArrayList.)
+                                     (.ensureCapacity size))]
+    (doseq [i (range size)]
+      (.add data nil ))
+    data))
 
 (defn make-ring-buffer [num-producers num-consumers size]
   (if (or (<= size 0)
@@ -128,7 +134,7 @@
     (raise "Size must be an multiple of the number of producers(%s) and the number of consumers(%s)" num-producers num-consumers))
   (let  [write-counts   (zipmap (range 1 (inc num-producers)) (repeat 0))
          read-counts    (zipmap (range 1 (inc num-consumers)) (repeat 0))
-         array          (object-array size)
+         array          (initialize-array size)    
          ring-buf       (RingBufferOpaque. size array num-producers num-consumers read-counts  write-counts)
          consumer-fns   (reduce
                          (fn [accum consumer]
@@ -151,6 +157,7 @@
 
 
 (comment
+  
   (def *rb* (make-ring-buffer 2 1 6))  
 
   (keys *rb*)
